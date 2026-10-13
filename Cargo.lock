@@ -1101,7 +1101,7 @@ dependencies = [
 [[package]]
 name = "craft-quit"
 version = "0.1.0"
-source = "git+https://github.com/storytold/craft-libs?rev=91be976027fc3dff0304d480b03cd9c55f6903c5#91be976027fc3dff0304d480b03cd9c55f6903c5"
+source = "git+https://github.com/storytold/craft-libs?rev=f58bc1a3df490992d633393d0898af0588ce882c#f58bc1a3df490992d633393d0898af0588ce882c"
 dependencies = [
  "dispatch2",
  "egui",
@@ -4007,6 +4007,7 @@ dependencies = [
  "arboard",
  "base64 0.22.1",
  "bytemuck",
+ "craft-quit",
  "craft-ui",
  "eframe",
  "egui",

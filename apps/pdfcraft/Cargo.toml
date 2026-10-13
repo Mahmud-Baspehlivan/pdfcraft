@@ -31,7 +31,7 @@ log = { workspace = true }
 fmv-macos-events = "=0.1.0"
 # ⌘Q asks about unsaved changes like the close button (#1136): an app menu whose Quit asks the
 # window to close instead of winit's, which ends the process without asking.
-craft-quit = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "91be976027fc3dff0304d480b03cd9c55f6903c5", features = ["menu"] }
+craft-quit = { workspace = true, features = ["menu"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # Asks the Wayland compositor which GPU it draws with (linux-dmabuf feedback), so the window is
