@@ -32,6 +32,25 @@ fn right_click(h: &mut Harness<'static, PdfCraftApp>, label: &str) {
 }
 
 #[test]
+fn automatic_text_tagging_opens_reviewable_tags() {
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
+        let mut app = PdfCraftApp::new();
+        app.set_option("language", "en").unwrap();
+        app.open_bytes("notes.pdf", None, FIXTURE.to_vec()).unwrap();
+        app
+    });
+    h.run_steps(3);
+    assert!(h.state_mut().execute("a11y.autotag"));
+    h.run_steps(2);
+    assert_eq!(h.state().right, Some(RightPanel::Tags));
+    let doc = h.state().session.get(h.state().views[h.state().active.unwrap()].id).unwrap();
+    let tags = doc.tags();
+    assert_eq!(tags.len(), 2);
+    assert_eq!(tags[1].kind, "P");
+    assert_eq!(doc.accessibility_check(&Default::default()).unwrap().result(Rule::TaggedPdf).unwrap().status, Status::Passed);
+}
+
+#[test]
 fn checking_fixing_skipping_and_reporting() {
     let dir = std::env::temp_dir().join(format!("pdfcraft-a11y-ui-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
@@ -316,6 +335,27 @@ fn tags_panel_moves_a_tag_within_its_siblings() {
     let doc = s.session.get(s.views[0].id).unwrap();
     assert_eq!(doc.tags().into_iter().map(|tag| tag.object.num).collect::<Vec<_>>(), [6, 8, 7]);
     assert_eq!(doc.can_undo(), Some("Move object"));
+}
+
+#[test]
+fn tags_panel_marks_a_leaf_tag_as_an_artifact() {
+    let mut h = Harness::builder().with_size(egui::vec2(1400.0, 900.0)).build_eframe(move |_cc| {
+        let mut app = PdfCraftApp::new();
+        app.set_option("language", "en").unwrap();
+        app.open_bytes("figures.pdf", None, FIGURES.to_vec()).unwrap();
+        app
+    });
+    h.run_steps(4);
+    assert!(h.state_mut().execute("a11y.tags"));
+    h.run_steps(2);
+    h.get_by_label("Figure · 7").click();
+    h.run_steps(1);
+    h.get_by_label("Mark as artifact").click();
+    h.run_steps(3);
+    let s = h.state();
+    let doc = s.session.get(s.views[0].id).unwrap();
+    assert_eq!(doc.tags().into_iter().map(|tag| tag.object.num).collect::<Vec<_>>(), [6, 8]);
+    assert_eq!(doc.can_undo(), Some("Mark content as artifact"));
 }
 
 #[test]
